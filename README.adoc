@@ -1,0 +1,82 @@
+= cc_config
+
+Generally useful stuff for C builds
+
+WARNING:  Unstable. Still under development. Use at your own risk.
+
+
+== repo paths
+
+Defines make variables that expand to paths suitable for passing with
+`-I` in cc rules. For example `copts = ["-I$(@foo)/include"]`.
+
+Usage:
+
+Add to `MODULE.bazel`:  `bazel_dep(name = "cc_config",    version = "1.0.0")`
+
+Then instantiate the macro in a `BUILD.bazel` file. List one target
+for each `bazel_dep` module for which you need an include path. Since
+these are dependencies, you may need to instantiate a separate target
+for dev dependencies.
+
+.//:BUILD.bzl
+----
+load("@cc_config//:MACROS.bzl", "repo_paths")
+PROD_REPOS = [
+    "@uthash//src:uthash",
+    "@liblogc//src:logc"
+]
+
+repo_paths(
+    name = "repo_paths",
+    repos = PROD_REPOS
+)
+
+repo_paths(
+    name = "test_repo_paths",
+    repos = PROD_REPOS + [
+        "@unity//src:unity" ## test-only
+    ]
+)
+----
+
+In this example, module `unity` is listed as a `dev_dependency` in
+`MODULE.bazel`.
+
+This defines one make variable for each repository listed in the
+`repos` attr. Add the `repo_paths` target label to the `toolchains`
+attribute and you can then use them as e.g. `$(@uthash)`,
+`$(@liblogc)`, etc. Note that `@` is included in the string. As a
+special case, `$(@)` resolves to the "current" repo.
+
+The make vars expand to the path, not just the repo identifier. In
+particular the expansion includes the `external/` prefix for external
+repos.
+
+For example, you might have:
+
+.@foo//src:BUILD.bazel
+----
+cc_library(
+...
+    deps = ["@liblogc//src:logc"],
+    copts = ["-I$(@)/src", "-I$(@liblogc)/src"],
+    toolchains = ["//:repo_paths"]
+    ...
+)
+----
+
+Assuming the versions of both `@foo` `@liblogc` are `1.0.0`, if this
+target is built from within the `foo` repo, the expansions are:
+
+* `$(@)` expands to `.`, yielding `-I./src`
+* `$(@liblogc)/src` expands to `external/liblogc~1.0.0/src`
+
+If this target is built as an external repo (i.e. module `foo` is
+listed as a `bazel_dep` for some other module):
+
+* `$(@)` expansion includes `external`, giving `-Iexternal/foo~1.0.0/src`
+* `$(@liblogc)/src` expands as above
+
+
+
