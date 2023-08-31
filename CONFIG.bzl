@@ -1,6 +1,6 @@
-BASE_DEPS = ["@liblogc//src:logc"]
-
-BASE_INCLUDE_PATHS = ["-I$(@liblogc)/src"]
+BASE_SRCS = []
+BASE_DEPS = []
+BASE_INCLUDE_PATHS = []
 
 BASE_COPTS = [
     "-x", "c",
