@@ -1,36 +1,22 @@
-BASE_SRCS = []
-BASE_DEPS = []
-BASE_INCLUDE_PATHS = []
-
 BASE_COPTS = [
     "-x", "c",
     "-Wall",
     "-Wextra",
+    "-Wfatal-errors",
 ] + select({
     "@platforms//os:macos": [
         "-std=c11",
-        "-Werror=pedantic", # not needed with -Werror?
-        "-Wpedantic", # same as -pedantic, strict ISO C and ISO C++ warnings
+        "-Werror=pedantic",
+        "-Wpedantic",
         "-pedantic-errors",
-        # "-Wno-gnu-statement-expression",
-        # "-Werror=pedantic",
-        # "-Wno-gnu",
-        # "-Wno-format-pedantic",
     ],
     "@platforms//os:linux": [
         "-std=gnu11",
         "-fPIC",
         # GCC:
-        "-Werror", # turn all warnings into errors
-        "-Wfatal-errors", # stop on first error
-        # "-Wl,--no-undefined",
+        "-Werror",
     ],
     "//conditions:default": ["-std=c11"],
-# }) + select({
-#     "@platforms//cpu:arm64": [
-#         # "-target", "arm64-apple-darwin22.5.0"
-#     ],
-#     "//conditions:default": [],
 })
 
 BASE_LINKOPTS = select({
@@ -39,14 +25,11 @@ BASE_LINKOPTS = select({
     "//conditions:default": []
 })
 
-BASE_DEFINES = select({
-    "@cc_config//profile:dev?": ["DEVBUILD"],
-    "//conditions:default": []
-}) + select({
-    "@cc_config//trace:trace?": ["TRACING"],
-    "//conditions:default": []
-})
-        # # "_XOPEN_SOURCE=500", # strdup
-        # "_POSIX_C_SOURCE=200809L", # strdup, strndup since glibc 2.10
-        # # "_DEFAULT_SOURCE"    # dirent DT_* macros
+# BASE_DEFINES = select({
+#     "@cc_config//profile:dev?": ["DEVBUILD"],
+#     "//conditions:default": []
+# }) + select({
+#     "@cc_config//trace:trace?": ["TRACING"],
+#     "//conditions:default": []
+# })
 
