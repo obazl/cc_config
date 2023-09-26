@@ -4,23 +4,37 @@ def _repo_paths_impl(ctx):
         print("ITEM: %s" % item)
 
         wsname = item.label.workspace_name
+        print("item.label.workspace_name: %s" % wsname)
+
         tildes = wsname.count("~")
+        print("tilde ct: %s" % tildes)
 
         ## https://bazel.build/external/extension#repository_names_and_visibility
-        # print("splitting %s" % wsname)
+        print("splitting %s" % wsname)
 
         segs = wsname.split("~")
         root_repo = segs[0]
-        version   = segs[1]
-        if tildes > 1:
-            # 2nd seg is repo version (or "override")
-            # 3rd is extension name
-            # 4th is extension repo
-            extension = segs[2]
-            ext_repo  = segs[3]
+        print("ROOT %s" % root_repo)
+
+        if root_repo == "_main":
+            root_repo = "."
+            if tildes > 0:
+                # should be a pair, extension~repo
+                ext_repo = segs[2]
+            else:
+                ext_repo  = None
         else:
-            extension = None
-            ext_repo  = None
+
+            version   = segs[1]
+            if tildes > 1:
+                # 2nd seg is repo version (or "override")
+                # 3rd is extension name
+                # 4th is extension repo
+                extension = segs[2]
+                ext_repo  = segs[3]
+            else:
+                extension = None
+                ext_repo  = None
 
         # print("REPO %s" % root_repo)
         # print("VERSION %s" % version)
@@ -34,7 +48,7 @@ def _repo_paths_impl(ctx):
 
     items["@"] = ctx.attr.this
 
-    # print("MAKE VARS: %s" % items)
+    print("MAKE VARS: %s" % items)
 
     return [platform_common.TemplateVariableInfo(items)]
 
