@@ -1,0 +1,65 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@makeheaders//src:RULES.bzl", "makeheaders")
+
+# load("@cc_config//:CONFIG.bzl",
+#      "BASE_COPTS",
+#      "BASE_LINKOPTS")
+BASE_COPTS = []
+BASE_LINKOPTS = []
+
+load("@cc_config//:MACROS.bzl", "repo_paths")
+
+PROD_REPOS = [
+    "@liblogc//src:logc",
+    "@uthash//src:uthash"
+]
+
+repo_paths(
+    name = "repo_paths",
+    repos = PROD_REPOS
+)
+
+repo_paths(
+    name = "test_repo_paths",
+    repos = PROD_REPOS + [
+        "@gopt//src:gopt",
+        "@unity//src:unity"
+    ]
+)
+
+cc_library(
+    name  = "xdgc",
+    srcs  = ["libxdgc.c", "mkhdrs"],
+    hdrs  = ["xdgc.h"],
+    deps  = ["@liblogc//src:logc",
+             "@uthash//src:uthash"],
+    copts = BASE_COPTS + [
+        # "-Wl,-no-warn-duplicate-libraries",
+        # "-Wno-unused-function",
+        "-I$(@liblogc)/src",
+        "-I$(@uthash)/src",
+        "-I$(GENDIR)/$(@)/src",
+    ] + select({
+        "@platforms//os:linux": ["-std=gnu11"],
+        "//conditions:default": ["-std=c11"],
+    }),
+    linkopts = ["-verbose", "-Wl,-no-warn-duplicate-libraries"],
+# -no_warn_duplicate_libraries"],
+    toolchains = [":repo_paths"],
+    visibility = ["//visibility:public"]
+)
+
+############
+makeheaders(
+    name             = "mkhdrs",
+    hdrs_srcs        = ["libxdgc.c"],
+)
+
+makeheaders(
+    name             = "export_hdr",
+    out              = "xdgc.h",
+    export_interface = True,
+    hdrs_srcs        = ["libxdgc.c"],
+    visibility       = ["//visibility:public"]
+)
+

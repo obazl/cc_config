@@ -1,0 +1,5 @@
+common --enable_bzlmod
+
+common --registry=https://raw.githubusercontent.com/obazl/registry/main/
+
+common --registry=https://bcr.bazel.build

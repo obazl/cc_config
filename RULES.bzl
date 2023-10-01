@@ -1,20 +1,20 @@
 def _repo_paths_impl(ctx):
     items = {}
     for item in ctx.attr.repos:
-        print("ITEM: %s" % item)
+        # print("ITEM: %s" % item)
 
         wsname = item.label.workspace_name
-        print("item.label.workspace_name: %s" % wsname)
+        # print("item.label.workspace_name: %s" % wsname)
 
         tildes = wsname.count("~")
-        print("tilde ct: %s" % tildes)
+        # print("tilde ct: %s" % tildes)
 
         ## https://bazel.build/external/extension#repository_names_and_visibility
-        print("splitting %s" % wsname)
+        # print("splitting %s" % wsname)
 
         segs = wsname.split("~")
         root_repo = segs[0]
-        print("ROOT %s" % root_repo)
+        # print("ROOT %s" % root_repo)
 
         if root_repo == "_main":
             root_repo = "."
@@ -48,7 +48,7 @@ def _repo_paths_impl(ctx):
 
     items["@"] = ctx.attr.this
 
-    print("MAKE VARS: %s" % items)
+    # print("MAKE VARS: %s" % items)
 
     return [platform_common.TemplateVariableInfo(items)]
 
