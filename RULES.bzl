@@ -47,7 +47,10 @@ def _repo_paths_impl(ctx):
             items["@" + root_repo] = item.label.workspace_root
 
     items["@"] = ctx.attr.this
+    items["MODULE_NAME"] = ctx.attr.module_name
+    items["MODULE_VERSION"] = ctx.attr.module_version
 
+    # print("THIS: %s" % ctx.attr.this)
     # print("MAKE VARS: %s" % items)
 
     return [platform_common.TemplateVariableInfo(items)]
@@ -56,5 +59,8 @@ def _repo_paths_impl(ctx):
 repo_paths_rule = rule(
     implementation = _repo_paths_impl,
     attrs = {"repos": attr.label_list(),
-             "this": attr.string()}
+             "this": attr.string(),
+             "module_name": attr.string(),
+             "module_version": attr.string()
+             }
 )

@@ -2,6 +2,7 @@ BASE_COPTS = [
     "-x", "c",
     "-Wall",
     "-Wextra",
+    "-Werror",
     "-Wfatal-errors",
 ] + select({
     "@platforms//os:macos": [

@@ -1,8 +1,8 @@
 = cc_config
+:toc:
+
 
 Generally useful stuff for C builds
-
-WARNING:  Unstable. Still under development. Use at your own risk.
 
 
 == repo paths
@@ -78,5 +78,19 @@ listed as a `bazel_dep` for some other module):
 * `$(@)` expansion includes `external`, giving `-Iexternal/foo~1.0.0/src`
 * `$(@liblogc)/src` expands as above
 
+== module name & version makevars
 
+Version 2 adds make variables `MODULE_NAME` and `MODULE_VERSION`, whose values are derived from Bazel's `native.module_name()` and `native.module_version()`, respectively.
+
+This allows C/C++ code to integrate the version string from MODULE.bazel, like so in BUILD.bazel (assuming one has configured //:repo_paths as directed above):
+
+----
+copts = ["'-D$(MODULE_NAME)_VERSION=\"$(MODULE_VERSION)\"'"]
+...
+toolchains = ["//:repo_paths"]
+----
+
+which generates on the cmd line: '-DMYMODULE_VERSION="2.1.2"'
+
+And in source code: `const char *mymodule_version = MYMODULE_VERSION;`
 

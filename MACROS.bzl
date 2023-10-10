@@ -11,4 +11,6 @@ def repo_paths(name, repos, visibility=None):
 
     repo_paths_rule(name = name, repos = repos,
                     this = _this,
+                    module_name = native.module_name().upper(),
+                    module_version = native.module_version(),
                     visibility = ["//visibility:public"])
